@@ -45,7 +45,7 @@ if(isset($_POST['submit'])){
 
    <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style1.css">
-
+   <link rel="stylesheet" href="css/tailwind.css">
 </head>
 <body>
    
