@@ -20,14 +20,21 @@ if(isset($_POST['submit'])){
    $pass = filter_var($pass, FILTER_SANITIZE_STRING);
    $cpass = sha1($_POST['cpass']);
    $cpass = filter_var($cpass, FILTER_SANITIZE_STRING);
-   
+
    $select_user = $conn->prepare("SELECT * FROM `users` WHERE email = ?");
    $select_user->execute([$email,]);
    $row = $select_user->fetch(PDO::FETCH_ASSOC);
 
+   $select_user_name = $conn->prepare("SELECT * FROM `users` WHERE name = ?");
+   $select_user_name->execute([$name]);
+   $row_name = $select_user_name->fetch(PDO::FETCH_ASSOC);
+
    if($select_user->rowCount() > 0){
       $message[] = 'email already exists!';
-   }else{
+   }else if($select_user_name->rowCount()>0){
+      $message[]='User name already exists!';
+   }
+   else{
       if($pass != $cpass){
          $message[] = 'confirm password not matched!';
       }else{
@@ -64,6 +71,9 @@ if(isset($_POST['submit'])){
 
    <form action="" method="post">
       <h3>register now</h3>
+      <?php
+     
+      ?>
       <input type="text" name="name" required placeholder="enter your username" maxlength="20"  class="box">
       <input type="email" name="email" required placeholder="enter your email" maxlength="50"  class="box" oninput="this.value = this.value.replace(/\s/g, '')">
       <input type="password" name="pass" required placeholder="enter your password" maxlength="20"  class="box" oninput="this.value = this.value.replace(/\s/g, '')">
