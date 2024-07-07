@@ -4,12 +4,15 @@ include 'components/connect.php';
 
 session_start();
 
+
 if (!isset($_SESSION['user_id'])) {
     header('location:user_login.php');
     exit;
 }
 $user_id = $_SESSION['user_id'];
-
+if (isset($_GET['order']) && $_GET['order'] == 'success') {
+   echo '<p class="success-message">Order placed successfully!</p>';
+}
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +31,7 @@ $user_id = $_SESSION['user_id'];
 <?php include 'components/user_header.php'; ?>
 
 <section class="checkout-orders">
-    <form action="khalti.php" method="POST" id="orderForm">
+    <form action="khalti.php" method="POST" id="orderForm" onsubmit="return validateForm()">
         <h3>Your Orders</h3>
         <div class="display-orders">
             <?php
@@ -61,7 +64,7 @@ $user_id = $_SESSION['user_id'];
             </div>
             <div class="inputBox">
                 <span>Your Number:</span>
-                <input type="number" name="number" placeholder="Enter your number" class="box" min="0" max="9999999999" onkeypress="if(this.value.length == 10) return false;" required>
+                <input type="number" name="number" placeholder="Enter your number" class="box" min="0" max="9999999999"  required>
             </div>
             <div class="inputBox">
                 <span>Your Email:</span>
@@ -102,7 +105,47 @@ $user_id = $_SESSION['user_id'];
 <script src="js/script.js"></script>
 
 <script>
+   
+   function validateForm() {
+    const form = document.getElementById('orderForm');
+    const name = form.name.value.trim();
+    const number = form.number.value.trim();
+    const email = form.email.value.trim();
+    const flat = form.flat.value.trim();
+    const street = form.street.value.trim();
+    const city = form.city.value.trim();
+    const state = form.state.value.trim();
+    const country = form.country.value.trim();
+    const pin_code = form.pin_code.value.trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!name || !number || !email || !flat || !street || !city || !state || !country || !pin_code) {
+        alert('All fields are required.');
+        return false;
+    }
+    if(!name.includes(" ")){
+      alert('Please enter full name.');
+      return false;
+    }
+    
+    if (!emailPattern.test(email)) {
+        alert('Please enter a valid email address.');
+        return false;
+    }
+    
+    if (number.length !== 10) {
+        alert('Phone number must be exactly 10 digits.');
+        return false;
+    }
+
+    return true;
+}
+
 document.getElementById('khalti-button').addEventListener('click', function () {
+    if (!validateForm()) {
+        return;
+    }
+
     var config = {
         "publicKey": "test_public_key_f33fa8c0a5c8475aa5fb7aa75ad10982",
         "productIdentity": "1234567890",
@@ -123,6 +166,17 @@ document.getElementById('khalti-button').addEventListener('click', function () {
     };
     var checkout = new KhaltiCheckout(config);
     checkout.show({amount: <?= $grand_total * 100; ?>});
+});
+
+document.addEventListener('click', (event) => {
+    // Check if the URL contains 'order=success'
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('order') && urlParams.get('order') === 'success') {
+        // Remove 'order=success' from the URL
+        const newUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState(null, '', newUrl);
+        document.querySelector(".success-message").remove();
+    }
 });
 </script>
 

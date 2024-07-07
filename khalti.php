@@ -31,6 +31,7 @@ if (isset($_POST['khalti_payment_token'])) {
         $delete_cart->execute([$user_id]);
 
         $message[] = 'Order placed successfully!';
+        header('location:checkout.php?order=success');
     } else {
         $message[] = 'Your cart is empty';
     }

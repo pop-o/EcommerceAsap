@@ -356,7 +356,15 @@ section {
   color: var(--black);
   user-select: none;
 }
-
+.success-message {
+  color: black;
+  font-size: 18px;
+  margin: 20px 0;
+  text-align: center;
+  background-color: white;
+  height: 3rem;
+  align-content: center;
+}
 .home-products .slide {
   position: relative;
   padding: 2rem;
