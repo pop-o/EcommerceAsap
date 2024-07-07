@@ -60,8 +60,8 @@ if(isset($_POST['order'])){
          $verification_response = verify_khalti_payment($khalti_payment_token, $total_price * 100); // Amount in paisa
 
          if ($verification_response && $verification_response['status'] == 'Completed') {
-            $insert_order = $conn->prepare("INSERT INTO `orders`(user_id, name, number, email, method, address, total_products, total_price) VALUES(?,?,?,?,?,?,?,?)");
-            $insert_order->execute([$user_id, $name, $number, $email, $method, $address, $total_products, $total_price]);
+            $insert_order = $conn->prepare("INSERT INTO `orders`(user_id, name, number, email, method, address, total_products, total_price,khalti_token) VALUES(?,?,?,?,?,?,?,?,?)");
+            $insert_order->execute([$user_id, $name, $number, $email, $method, $address, $total_products, $total_price,$khalti_payment_token]);
 
             $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE user_id = ?");
             $delete_cart->execute([$user_id]);
@@ -190,7 +190,7 @@ if(isset($_POST['order'])){
       </div>
       <input type="hidden" name="khalti_payment_token" id="khalti_payment_token">
       <input type="submit" name="order" class="btn <?= ($grand_total > 1)?'':'disabled'; ?>" value="Place Order">
-      <button type="button" class="btn" id="khalti-button" style="display:none;">Pay with Khalti</button>
+      <button type="button" name="order" value="order" class="btn" id="khalti-button" style="display:none;">Pay with Khalti</button>
 
    </form>
 
@@ -230,10 +230,15 @@ document.getElementById('khalti-button').addEventListener('click', function() {
             input.type = 'hidden';
             input.name = 'khalti_payment_token';
             input.value = payload.token;
+            console.log(payload);
+
             form.appendChild(input);
+            
             form.submit();
+            
          },
          onError (error) {
+            console.log(payload);
             console.log(error);
          },
          onClose () {
